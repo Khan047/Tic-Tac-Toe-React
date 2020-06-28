@@ -2,20 +2,42 @@ import React, { useState , useEffect, useCallback} from "react";
 import styled from "styled-components";
 import  {Tri}  from './a.png';
 import './App.css';
-//import {  PLAYER_X, PLAYER_O, SQUARE_DIMS } from "./constants";
+import circle  from './cc.png';
+import triangle from './triangle.png';
+import Board from './Board';
+//import {  PLAYER_T, PLAYER_O, SQUARE_DIMS } from "./constants";
 
 const arr = new Array(3 ** 2).fill(null);
 let PLAYER_O='O';
-let PLAYER_X='X';
+let PLAYER_T='T';
 let  SQUARE_DIMS = 100;
+ const GAME_STATES = {
+    notStarted: "not_started",
+    inProgress: "in_progress",
+    over: "over"
+  };
+  const switchPlayer = player => {
+    return player === PLAYER_T ? PLAYER_O : PLAYER_T;
+  };
 const TicTacToe = () => {
+const [players, setPlayers] = useState({ human: null, computer: null });
+const [gameState, setGameState] = useState(GAME_STATES.notStarted);
+const [winner, setWinner] = useState(null);
+const board = new Board();
+//...
+const choosePlayer = option => {
+  setPlayers({ human: option, computer: switchPlayer(option) });
+  setGameState(GAME_STATES.inProgress);
+  setNextMove(PLAYER_T); // Set the Player T to make the first move
+};
   const [grid, setGrid] = useState(arr);
+
   const [nextMove, setNextMove] = useState(null);
-  const [players, setPlayers] = useState({
-    human: PLAYER_X,
-    computer: PLAYER_O
-  });
- // setNextMove(PLAYER_X)
+//   const [players, setPlayers] = useState({
+//     human: PLAYER_T,
+//     computer: PLAYER_O
+//   });
+ // setNextMove(PLAYER_T)
   const getRandomInt = (min, max) => {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -38,19 +60,20 @@ const TicTacToe = () => {
     setNextMove(players.human);
   
   }, [move, grid, players]);
+
   const humanMove = index => {
-    if (!grid[index]) {
+    if (!grid[index] && nextMove === players.human) {
       move(index, players.human);
       setNextMove(players.computer);
-    //   computerMove();
     }
   };
+
   useEffect(() => {
     let timeout;
     if (
       nextMove !== null &&
-      nextMove === players.computer
-    
+      nextMove === players.computer &&
+      gameState !== GAME_STATES.over
     ) {
       // Delay computer moves to make them more natural
       timeout = setTimeout(() => {
@@ -58,27 +81,135 @@ const TicTacToe = () => {
       }, 500);
     }
     return () => timeout && clearTimeout(timeout);
-  }, [nextMove, computerMove, players.computer]);
+  }, [nextMove, computerMove, players.computer, gameState]);
+
+
+
+
+  //...
+ 
+
+  //...
+
+  useEffect(() => {
+    const winner = board.getWinner(grid);
+    const declareWinner = winner => {
+      let winnerStr;
+      switch (winner) {
+        case PLAYER_T:
+          winnerStr = "Player T wins!";
+          break;
+        case PLAYER_O:
+          winnerStr = "Player O wins!";
+          break;
+        case 0:
+        default:
+          winnerStr = "It's a draw";
+      }
+      setGameState(GAME_STATES.over);
+      setWinner(winnerStr);
+    };
+
+    if (winner !== null && gameState !== GAME_STATES.over) {
+      declareWinner(winner);
+    }
+  }, [gameState, grid, nextMove]);
+
+
   
-  return (
-    <Container dims={3}>
-        {/* {setNextMove(PLAYER_X)} */}
-      {grid.map((value, index) => {
-        const isActive = value !== null;
+  // return gameState === GAME_STATES.notStarted ? (
+  //   <Screen>
+  //     <Inner>
+  //       <ChooseText >Choose your player</ChooseText>
+  //       <ButtonRow>
+  //         <button  onClick={() => choosePlayer(PLAYER_T)}>Triangle</button>
+  //         <p>or</p>
+  //         <button onClick={() => choosePlayer(PLAYER_O)}>Circle</button>
+  //       </ButtonRow>
+  //     </Inner>
+  //   </Screen>
+  // ) : (
+  //   <Container dims={3}>
+  //     {grid.map((value, index) => {
+  //       const isActive = value !== null;
 
-        return (
-          <Square id={'a'+index}
-            key={index}
-            onClick={() => humanMove(index)}
-          >
-            {isActive && <Marker>{value === PLAYER_X ?<img src="https://i.ibb.co/gPs5PY1/Screenshot-24.png" alt="Screenshot-24" border="0" height='40px' width ='40px' /> : <img src="https://i.ibb.co/DYr196q/c2.png" alt="c2" border="0"/>}</Marker>}
-          </Square>
-        );
-      })}
-    </Container>
-  );
+  //       return (
+  //         <Square id ={'a'+index}
+  //           key={index}
+  //           onClick={() => humanMove(index)}
+  //         >
+  //           {isActive && <Marker>{value === PLAYER_T ? <img src={triangle} alt="" /> : <img src={circle} alt="" />}</Marker>}
+  //         </Square>
+  //       );
+  //     })}
+  //   </Container>
+  // );
+  const startNewGame = () => {
+    setGameState(GAME_STATES.notStarted);
+    setGrid(arr);
+  };
+  
+  switch (gameState) {
+    case GAME_STATES.notStarted:
+    default:
+      return (
+        <Screen>
+          <Inner>
+            <ChooseText>Choose your player</ChooseText>
+            <ButtonRow>
+              <button onClick={() => choosePlayer(PLAYER_T)}>Triangle</button>
+              <p>or</p>
+              <button onClick={() => choosePlayer(PLAYER_O)}>Circle</button>
+            </ButtonRow>
+          </Inner>
+        </Screen>
+      );
+    case GAME_STATES.inProgress:
+      return (
+        <Container dims={3}>
+          {grid.map((value, index) => {
+            const isActive = value !== null;
+  
+            return (
+              <Square id={'a'+index}
+                key={index}
+                onClick={() => humanMove(index)}
+              >
+                {isActive && <Marker>{value === PLAYER_T ? <img src={triangle} alt="" className='scale-in-center' /> : <img src={circle} alt=""  className='scale-in-center'/>}</Marker>}
+              </Square>
+            );
+          })}
+        </Container>
+      );
+    case GAME_STATES.over:
+      return (
+        <div>
+           <ChooseText>{winner}</ChooseText>
+          <button onClick={startNewGame}>Start over</button>
+        </div>
+      );
+  }
+
+  
 };
+const ButtonRow = styled.div`
+  display: flex;
+  width: 150px;
+  justify-content: space-between;
+ 
+`;
 
+const Screen = styled.div`
+color:white;
+
+`;
+
+const Inner = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+`;
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -95,6 +226,7 @@ const Container = styled.div`
 `;
 
 const Square = styled.div`
+position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -105,12 +237,18 @@ const Square = styled.div`
   &:hover {
     cursor: pointer;
   }
+  
+
+  
 `;
 
 const Marker = styled.p`
 
-  color:black;
   align-items:center;
 `;
 
+
+const ChooseText = styled.p`
+color:white;
+`;
 export default TicTacToe;

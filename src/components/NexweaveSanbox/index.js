@@ -7,8 +7,9 @@ import {
 export default function NexweaveSandBox(props) {
   return (
     <Wrapper>
-      <VideoWrapper/>
+      <VideoWrapper>
       {props.widget}
+      </VideoWrapper>
     </Wrapper>
   )
 }
