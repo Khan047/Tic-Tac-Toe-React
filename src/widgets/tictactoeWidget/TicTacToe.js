@@ -23,7 +23,14 @@ const TicTacToe = () => {
 const [players, setPlayers] = useState({ human: null, computer: null });
 const [gameState, setGameState] = useState(GAME_STATES.notStarted);
 const [winner, setWinner] = useState(null);
+
+// const [winner, setWinner] = useState(null);
 const board = new Board();
+
+let newStyle;
+
+const [nextMove, setNextMove] = useState(null);
+
 //...
 const choosePlayer = option => {
   setPlayers({ human: option, computer: switchPlayer(option) });
@@ -31,8 +38,9 @@ const choosePlayer = option => {
   setNextMove(PLAYER_T); // Set the Player T to make the first move
 };
   const [grid, setGrid] = useState(arr);
+  
 
-  const [nextMove, setNextMove] = useState(null);
+
 //   const [players, setPlayers] = useState({
 //     human: PLAYER_T,
 //     computer: PLAYER_O
@@ -78,7 +86,7 @@ const choosePlayer = option => {
       // Delay computer moves to make them more natural
       timeout = setTimeout(() => {
         computerMove();
-      }, 500);
+      }, 600);
     }
     return () => timeout && clearTimeout(timeout);
   }, [nextMove, computerMove, players.computer, gameState]);
@@ -93,23 +101,41 @@ const choosePlayer = option => {
 
   useEffect(() => {
     const winner = board.getWinner(grid);
+    newStyle = board.getStrikethroughStyles();
+
+    newStyle!=null&&document.getElementById('sty')!==null?document.getElementById('sty').style=newStyle:console.log(newStyle);
+    console.log(newStyle)
     const declareWinner = winner => {
       let winnerStr;
       switch (winner) {
         case PLAYER_T:
           winnerStr = "Player T wins!";
+       
+           //  alert(winnerStr);
+    
           break;
         case PLAYER_O:
           winnerStr = "Player O wins!";
+          
+          //  alert(winnerStr);
+       
           break;
         case 0:
         default:
           winnerStr = "It's a draw";
+          
+          // alert(winnerStr);
+        
       }
-      setGameState(GAME_STATES.over);
-      setWinner(winnerStr);
+      setTimeout(() => {
+        setGameState(GAME_STATES.over);
+      }, 499);
+       
+   
+      
+        setWinner(winnerStr);
     };
-
+   
     if (winner !== null && gameState !== GAME_STATES.over) {
       declareWinner(winner);
     }
@@ -117,39 +143,76 @@ const choosePlayer = option => {
 
 
   
-  // return gameState === GAME_STATES.notStarted ? (
-  //   <Screen>
-  //     <Inner>
-  //       <ChooseText >Choose your player</ChooseText>
-  //       <ButtonRow>
-  //         <button  onClick={() => choosePlayer(PLAYER_T)}>Triangle</button>
-  //         <p>or</p>
-  //         <button onClick={() => choosePlayer(PLAYER_O)}>Circle</button>
-  //       </ButtonRow>
-  //     </Inner>
-  //   </Screen>
-  // ) : (
-  //   <Container dims={3}>
-  //     {grid.map((value, index) => {
-  //       const isActive = value !== null;
-
-  //       return (
-  //         <Square id ={'a'+index}
-  //           key={index}
-  //           onClick={() => humanMove(index)}
-  //         >
-  //           {isActive && <Marker>{value === PLAYER_T ? <img src={triangle} alt="" /> : <img src={circle} alt="" />}</Marker>}
-  //         </Square>
-  //       );
-  //     })}
-  //   </Container>
-  // );
   const startNewGame = () => {
     setGameState(GAME_STATES.notStarted);
     setGrid(arr);
   };
-  
+  const renderStrike = () =>{
+    console.log(board.getStrikethroughStyles())
+     return board.getStrikethroughStyles()
+  }
+  let board2 = new Board();
+  // return gameState === GAME_STATES.notStarted ? (
+  //   <Screen>
+  //     <Inner>
+  //       <ChooseText>Select difficulty</ChooseText>
+  //       {/* <select onChange={changeMode} value={mode}>
+  //         {Object.keys(GAME_MODES).map(key => {
+  //           const gameMode = GAME_MODES[key];
+  //           return (
+  //             <option key={gameMode} value={gameMode}>
+  //               {key}
+  //             </option>
+  //           );
+  //         })}
+  //       </select> */}
+  //     </Inner>
+  //     <Inner>
+  //     <ChooseText>Choose your player</ChooseText>
+  //           <ButtonRow>
+          
+  //             {/* <button onClick={() => choosePlayer(PLAYER_T)}>Triangle</button> */}
+  //             <input type="image" src={triangle}  onClick={() => choosePlayer(PLAYER_O)}/>
+  //             <p>or</p>
+  //             {/* <button onClick={() => choosePlayer(PLAYER_O)}>Circle</button> */}
+  //             <input type="image" src={circle}  onClick={() => choosePlayer(PLAYER_O)}/>
+  //           </ButtonRow>
+  //         </Inner>
+      
+  //   </Screen>
+  // ) : (
+  //   <Container dims={3}>
+      
+  //     {grid.map((value, index) => {
+  //       const isActive = value !== null;
+
+  //       return (
+  //         <Square id={'a'+index}
+  //                key={index}
+  //               onClick={() => humanMove(index)}
+  //             >
+      
+  //               {isActive && <Marker>{value === PLAYER_T ? <img src={triangle} alt="" className='scale-in-center' /> : <img src={circle} alt=""  className='scale-in-center'/>}</Marker>}
+                
+  //             </Square>
+  //       );
+  //     })}
+     
+      
+     
+  //     {console.log(sty)}
+  //    {console.log(board.getStrikethroughStyles())}
+  //    {console.log(board2.lineStyle)}
+    
+  // <Strikethrough id='sty'
+        
+  //     />
+     
+  //   </Container>
+  // );
+
   switch (gameState) {
+    
     case GAME_STATES.notStarted:
     default:
       return (
@@ -157,37 +220,60 @@ const choosePlayer = option => {
           <Inner>
             <ChooseText>Choose your player</ChooseText>
             <ButtonRow>
-              <button onClick={() => choosePlayer(PLAYER_T)}>Triangle</button>
+          
+              {/* <button onClick={() => choosePlayer(PLAYER_T)}>Triangle</button> */}
+              <input type="image" src={triangle} ALT="SUBMIT" onClick={() => choosePlayer(PLAYER_T)}/>
               <p>or</p>
-              <button onClick={() => choosePlayer(PLAYER_O)}>Circle</button>
+              {/* <button onClick={() => choosePlayer(PLAYER_O)}>Circle</button> */}
+              <input type="image" src={circle} ALT="SUBMIT" onClick={() => choosePlayer(PLAYER_O)}/>
             </ButtonRow>
           </Inner>
+          
         </Screen>
       );
     case GAME_STATES.inProgress:
       return (
+       
         <Container dims={3}>
+          <Strikethrough
+        styles={
+          board.getStrikethroughStyles()
+        }
+      />
+        {  console.log(board.getStrikethroughStyles())}
+         {console.log(board.lineStyle)}
           {grid.map((value, index) => {
             const isActive = value !== null;
   
             return (
+         
               <Square id={'a'+index}
                 key={index}
                 onClick={() => humanMove(index)}
               >
+      
                 {isActive && <Marker>{value === PLAYER_T ? <img src={triangle} alt="" className='scale-in-center' /> : <img src={circle} alt=""  className='scale-in-center'/>}</Marker>}
+              
               </Square>
+             
             );
           })}
+            
+  <Strikethrough id='sty'
+        
+  />
         </Container>
       );
     case GAME_STATES.over:
-      return (
-        <div>
-           <ChooseText>{winner}</ChooseText>
-          <button onClick={startNewGame}>Start over</button>
-        </div>
-      );
+  
+        return (
+          
+          <div>
+             <ChooseText>{winner}</ChooseText>
+            <button onClick={startNewGame}>Start over</button>
+          </div>
+        );
+     
   }
 
   
@@ -219,6 +305,7 @@ const Container = styled.div`
   align-items:center;
   background-color:white;
   border: 1px solid gray;
+
     border-radius: 50px;
     -webkit-box-shadow: 2px 2px 29px 4px rgba(212,212,212,0.41);
     -moz-box-shadow: 2px 2px 29px 4px rgba(212,212,212,0.41);
@@ -247,6 +334,13 @@ const Marker = styled.p`
   align-items:center;
 `;
 
+const Strikethrough = styled.div`
+  position: absolute;
+  ${({ styles }) => styles}
+  background-color: indianred;
+  height: 5px;
+  width: ${({ styles }) => !styles && "0px"};
+`;
 
 const ChooseText = styled.p`
 color:white;

@@ -3,6 +3,7 @@
 export default class Board {
   constructor(grid) {
     this.grid = grid || new Array(3 ** 2).fill(null);
+    this.winningIndex=null;
   }
 
   // Collect indices of empty squares and return them
@@ -29,6 +30,7 @@ export default class Board {
       [0, 4, 8],
       [2, 4, 6]
     ];
+    
     let res = null;
     winningCombos.forEach((el, i) => {
       if (
@@ -37,13 +39,83 @@ export default class Board {
         grid[el[0]] === grid[el[2]]
       ) {
         res = grid[el[0]];
+        console.log(res,el,i)
+        this.winningIndex = i;
       } else if (res === null && this.getEmptySquares(grid).length === 0) {
         res = 0;
+        this.winningIndex = null;
       }
     });
+     // console.log(this.getStrikethroughStyles())
+      const lineStyle = this.getStrikethroughStyles();
+   // console.log(this.winningIndex);
     return res;
+    
   };
-
+  getStrikethroughStyles = () => {
+    const defaultWidth = 285;
+    const diagonalWidth = 400;
+    switch (this.winningIndex) {
+      case 0:
+        return `
+          transform: none;
+          top: 41px;
+          left: 15px;
+          width: ${defaultWidth}px;
+        `;
+      case 1:
+        return `
+          transform: none;
+          top: 140px;
+          left: 15px;
+          width: ${defaultWidth}px;
+        `;
+      case 2:
+        return `
+          transform: none;
+          top: 242px;
+          left: 15px;
+          width: ${defaultWidth}px;
+        `;
+      case 3:
+        return `
+          transform: rotate(90deg);
+          top: 145px;
+          left: -86px;
+          width: ${defaultWidth}px;
+        `;
+      case 4:
+        return `
+          transform: rotate(90deg);
+          top: 145px;
+          left: 15px;
+          width: ${defaultWidth}px;
+        `;
+      case 5:
+        return `
+          transform: rotate(90deg);
+          top: 145px;
+          left: 115px;
+          width: ${defaultWidth}px;
+        `;
+      case 6:
+        return `
+          transform: rotate(45deg);
+          top: 145px;
+          left: -44px;
+          width: ${diagonalWidth}px;
+        `;
+      case 7:
+        return `
+          transform: rotate(-45deg);
+          top: 145px;
+          left: -46px;
+          width: ${diagonalWidth}px;
+        `;
+      default:
+        return null;
+    }
+  };
   clone = () => {
     return new Board(this.grid.concat());
   };
